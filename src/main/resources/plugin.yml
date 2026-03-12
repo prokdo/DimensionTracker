@@ -1,0 +1,4 @@
+name: DimensionTracker
+version: 1.0.0
+main: ru.prokdo.DimensionTracker
+api-version: '1.21'
