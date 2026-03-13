@@ -1,6 +1,10 @@
 # DimensionTracker
 
-[🇷🇺 Русский](README_RU.md) | [🇬🇧 English](README.md)
+[![CurseForge](https://img.shields.io/badge/Доступно%20на-CurseForge-F16436?logo=curseforge&style=flat)](https://curseforge.com/minecraft/bukkit-plugins/dimension-tracker) [![Modrinth](https://img.shields.io/badge/Доступно%20на-Modrinth-00AF5C?logo=modrinth&style=flat)](https://modrinth.com/plugin/dimensiontracker)
+
+---
+
+[🇬🇧 EN](README.md) | [🇷🇺 RU](README_RU.md)
 
 Плагин для Minecraft серверов, основанных на Paper, который окрашивает имена игроков в чате и TAB-списке в зависимости от текущего измерения
 
