@@ -2,3 +2,8 @@ name: DimensionTracker
 version: 1.0.0
 main: ru.prokdo.DimensionTracker
 api-version: '1.21'
+
+permissions:
+  dimensiontracker.reload:
+    description: Allow reloading DimensionTracker config
+    default: op
