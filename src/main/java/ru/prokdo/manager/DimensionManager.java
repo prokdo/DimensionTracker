@@ -1,56 +1,47 @@
 package ru.prokdo.manager;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-
-import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
+
+import ru.prokdo.config.PluginConfig;
+
 public class DimensionManager {
-    private final Map<UUID, World.Environment> playerDimensions = new HashMap<>();
+    private final PluginConfig config;
+
+    public DimensionManager(PluginConfig config) {
+        this.config = config;
+    }
 
     public void update(Player player) {
-        playerDimensions.put(player.getUniqueId(), player.getWorld().getEnvironment());
-        updatePlayerTabList(player);
+        if (!config.isTabEnabled()) {
+            return;
+        }
+        final var color = getColorForPlayer(player);
+        player.playerListName(Component.text(player.getName(), color));
     }
 
-    public void remove(Player player) {
-        playerDimensions.remove(player.getUniqueId());
-        updatePlayerTabList(player);
-    }
-
-    public World.Environment get(Player player) {
-        return playerDimensions.getOrDefault(player.getUniqueId(), World.Environment.NORMAL);
-    }
-
-    public void initializeOnlinePlayers() {
-        for (final var player : Bukkit.getOnlinePlayers()) {
+    public void update(Iterable<? extends Player> players) {
+        for (final var player : players) {
             update(player);
         }
     }
 
-    public NamedTextColor getColorForPlayer(Player player) {
-        final var env = get(player);
-        return getColorForEnvironment(env);
-    }
+    public TextColor getColorForPlayer(Player player) {
+        final var worldName = player.getWorld().getName();
+        final var worldColors = config.getWorldColors();
 
-    private void updatePlayerTabList(Player player) {
-        final var env = get(player);
-        final var color = getColorForEnvironment(env);
-        player.playerListName(Component.text(player.getName(), color));
-    }
+        if (worldColors.containsKey(worldName)) {
+            return worldColors.get(worldName);
+        }
 
-    private NamedTextColor getColorForEnvironment(World.Environment env) {
+        final var env = player.getWorld().getEnvironment();
         return switch (env) {
-            case NORMAL -> NamedTextColor.GREEN;
-            case NETHER -> NamedTextColor.RED;
-            case THE_END -> NamedTextColor.LIGHT_PURPLE;
-            default -> NamedTextColor.WHITE;
+            case NORMAL -> config.getOverworldColor();
+            case NETHER -> config.getNetherColor();
+            case THE_END -> config.getEndColor();
+            default -> config.getDefaultColor();
         };
     }
 }

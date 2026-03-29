@@ -1,29 +1,38 @@
 package ru.prokdo;
 
+import java.util.List;
+
 import org.bukkit.Bukkit;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import ru.prokdo.listener.DimensionListener;
-import ru.prokdo.manager.DimensionManager;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 
-public class DimensionTracker extends JavaPlugin implements Listener {
+import ru.prokdo.command.DimensionTrackerCommand;
+import ru.prokdo.config.PluginConfig;
+import ru.prokdo.manager.DimensionManager;
+import ru.prokdo.listener.DimensionListener;
+
+public class DimensionTracker extends JavaPlugin {
+    private PluginConfig pluginConfig;
     private DimensionManager dimensionManager;
     private DimensionListener dimensionListener;
 
     @Override
     public void onEnable() {
-        dimensionManager = new DimensionManager();
-        dimensionListener = new DimensionListener(dimensionManager);
+        pluginConfig = new PluginConfig(this);
+        dimensionManager = new DimensionManager(pluginConfig);
+        dimensionListener = new DimensionListener(pluginConfig, dimensionManager);
 
         Bukkit.getPluginManager().registerEvents(dimensionListener, this);
+        registerCommands();
 
-        dimensionManager.initializeOnlinePlayers();
+        dimensionManager.update(Bukkit.getOnlinePlayers());
     }
 
-    @Override
-    public void onDisable() {
-        dimensionManager = null;
-        dimensionListener = null;
+    private void registerCommands() {
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+            final var command = new DimensionTrackerCommand(pluginConfig, dimensionManager);
+            event.registrar().register(command.build(), "DimensionTracker plugin command", List.of("dt"));
+        });
     }
 }

@@ -1,23 +1,25 @@
 package ru.prokdo.listener;
 
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+
 import io.papermc.paper.chat.ChatRenderer;
 import io.papermc.paper.event.player.AsyncChatEvent;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-
+import ru.prokdo.config.PluginConfig;
 import ru.prokdo.manager.DimensionManager;
 
 public class DimensionListener implements Listener {
+    private final PluginConfig config;
     private final DimensionManager dimensionManager;
 
-    public DimensionListener(DimensionManager dimensionManager) {
+    public DimensionListener(PluginConfig config, DimensionManager dimensionManager) {
+        this.config = config;
         this.dimensionManager = dimensionManager;
     }
 
@@ -28,12 +30,6 @@ public class DimensionListener implements Listener {
     }
 
     @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        final var player = event.getPlayer();
-        dimensionManager.remove(player);
-    }
-
-    @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent event) {
         final var player = event.getPlayer();
         dimensionManager.update(player);
@@ -41,6 +37,10 @@ public class DimensionListener implements Listener {
 
     @EventHandler
     public void onChat(AsyncChatEvent event) {
+        if (!config.isChatEnabled()) {
+            return;
+        }
+
         final var player = event.getPlayer();
         final var color = dimensionManager.getColorForPlayer(player);
 
