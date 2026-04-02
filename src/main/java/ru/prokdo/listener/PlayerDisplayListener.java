@@ -11,28 +11,28 @@ import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
+import ru.prokdo.manager.PlayerColorManager;
 import ru.prokdo.config.PluginConfig;
-import ru.prokdo.manager.DimensionManager;
 
-public class DimensionListener implements Listener {
+public class PlayerDisplayListener implements Listener {
     private final PluginConfig config;
-    private final DimensionManager dimensionManager;
+    private final PlayerColorManager colorManager;
 
-    public DimensionListener(PluginConfig config, DimensionManager dimensionManager) {
+    public PlayerDisplayListener(PluginConfig config, PlayerColorManager colorManager) {
         this.config = config;
-        this.dimensionManager = dimensionManager;
+        this.colorManager = colorManager;
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         final var player = event.getPlayer();
-        dimensionManager.update(player);
+        colorManager.update(player);
     }
 
     @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent event) {
         final var player = event.getPlayer();
-        dimensionManager.update(player);
+        colorManager.update(player);
     }
 
     @EventHandler
@@ -42,7 +42,7 @@ public class DimensionListener implements Listener {
         }
 
         final var player = event.getPlayer();
-        final var color = dimensionManager.getColorForPlayer(player);
+        final var color = colorManager.getColorForPlayer(player);
 
         final var playerName = player.getName();
         final var coloredName = Component.text(playerName, color);

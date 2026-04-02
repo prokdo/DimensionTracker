@@ -7,3 +7,6 @@ permissions:
   dimensiontracker.reload:
     description: Allow reloading DimensionTracker config
     default: op
+  dimensiontracker.afk:
+    description: Allows toggling AFK status manually
+    default: true
