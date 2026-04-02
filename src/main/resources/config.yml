@@ -4,10 +4,15 @@ chat:
 tab:
   enabled: true
 
+afk:
+  enabled:  true
+  timeout:  300         # seconds, must be a positive number
+
 colors:
   overworld:  "#00FF00" # or GREEN / green
   nether:     "#FF0000" # or RED / red
   end:        "#FF55FF" # or LIGHT_PURPLE / light_purple
+  afk:        "#808080" # or GRAY / gray
   default:    "#FFFFFF" # or WHITE / white
 
   # Custom world example:

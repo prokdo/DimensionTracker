@@ -5,16 +5,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
+import ru.prokdo.DimensionTracker;
+
 public class PluginConfig {
-    private final JavaPlugin plugin;
+    private final DimensionTracker plugin;
 
     private boolean chatEnabled;
     private boolean tabEnabled;
+    private boolean afkEnabled;
+
+    private int afkTimeout;
+    private TextColor afkColor;
 
     private TextColor overworldColor;
     private TextColor netherColor;
@@ -23,7 +28,7 @@ public class PluginConfig {
 
     private final Map<String, TextColor> worldColors = new HashMap<>();
 
-    public PluginConfig(JavaPlugin plugin) {
+    public PluginConfig(DimensionTracker plugin) {
         this.plugin = plugin;
         plugin.saveDefaultConfig();
         load();
@@ -35,6 +40,18 @@ public class PluginConfig {
 
     public boolean isTabEnabled() {
         return tabEnabled;
+    }
+
+    public boolean isAfkEnabled() {
+        return afkEnabled;
+    }
+
+    public int getAfkTimeout() {
+        return afkTimeout;
+    }
+
+    public TextColor getAfkColor() {
+        return afkColor;
     }
 
     public TextColor getOverworldColor() {
@@ -63,19 +80,32 @@ public class PluginConfig {
 
         chatEnabled = config.getBoolean("chat.enabled", true);
         tabEnabled = config.getBoolean("tab.enabled", true);
+        afkEnabled = config.getBoolean("afk.enabled", true);
+
+        afkTimeout = config.getInt("afk.timeout", 300);
+        if (afkTimeout <= 0) {
+            plugin.getLogger().warning("AFK timeout must be a positive number, using default (300)");
+            afkTimeout = 300;
+        }
 
         final var colors = config.getConfigurationSection("colors");
 
         overworldColor = parseColor(colors, "overworld", NamedTextColor.GREEN);
         netherColor = parseColor(colors, "nether", NamedTextColor.RED);
         endColor = parseColor(colors, "end", NamedTextColor.LIGHT_PURPLE);
+        afkColor = parseColor(colors, "afk", NamedTextColor.GRAY);
         defaultColor = parseColor(colors, "default", NamedTextColor.WHITE);
 
+        registerWorldColors(colors);
+    }
+
+    private void registerWorldColors(ConfigurationSection colors) {
         worldColors.clear();
         if (colors != null) {
             for (final var key : colors.getKeys(false)) {
                 if (key.equals("overworld") || key.equals("nether") ||
-                        key.equals("end") || key.equals("default")) {
+                        key.equals("end") || key.equals("afk") ||
+                        key.equals("default")) {
                     continue;
                 }
                 final var color = parseColor(colors, key, null);

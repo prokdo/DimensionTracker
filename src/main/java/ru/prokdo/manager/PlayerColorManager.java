@@ -7,11 +7,16 @@ import net.kyori.adventure.text.format.TextColor;
 
 import ru.prokdo.config.PluginConfig;
 
-public class DimensionManager {
+public class PlayerColorManager {
     private final PluginConfig config;
+    private AfkManager afkManager;
 
-    public DimensionManager(PluginConfig config) {
+    public PlayerColorManager(PluginConfig config) {
         this.config = config;
+    }
+
+    public void setAfkManager(AfkManager afkManager) {
+        this.afkManager = afkManager;
     }
 
     public void update(Player player) {
@@ -23,12 +28,14 @@ public class DimensionManager {
     }
 
     public void update(Iterable<? extends Player> players) {
-        for (final var player : players) {
-            update(player);
-        }
+        players.forEach(this::update);
     }
 
     public TextColor getColorForPlayer(Player player) {
+        if (afkManager != null && afkManager.isAfk(player)) {
+            return config.getAfkColor();
+        }
+
         final var worldName = player.getWorld().getName();
         final var worldColors = config.getWorldColors();
 
