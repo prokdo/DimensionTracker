@@ -13,6 +13,7 @@ import ru.prokdo.manager.AfkManager;
 import ru.prokdo.manager.PlayerColorManager;
 import ru.prokdo.listener.AfkListener;
 import ru.prokdo.listener.PlayerDisplayListener;
+import ru.prokdo.listener.SystemMessageListener;
 
 public class DimensionTracker extends JavaPlugin {
     private PluginConfig pluginConfig;
@@ -20,6 +21,7 @@ public class DimensionTracker extends JavaPlugin {
     private PlayerDisplayListener displayListener;
     private AfkManager afkManager;
     private AfkListener afkListener;
+    private SystemMessageListener systemMessageListener;
 
     @Override
     public void onEnable() {
@@ -32,9 +34,11 @@ public class DimensionTracker extends JavaPlugin {
 
         displayListener = new PlayerDisplayListener(pluginConfig, colorManager);
         afkListener = new AfkListener(afkManager);
+        systemMessageListener = new SystemMessageListener(pluginConfig, colorManager);
 
         Bukkit.getPluginManager().registerEvents(displayListener, this);
         Bukkit.getPluginManager().registerEvents(afkListener, this);
+        Bukkit.getPluginManager().registerEvents(systemMessageListener, this);
 
         registerCommands();
 

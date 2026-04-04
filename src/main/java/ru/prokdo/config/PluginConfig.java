@@ -16,7 +16,14 @@ public class PluginConfig {
 
     private boolean chatEnabled;
     private boolean tabEnabled;
+
     private boolean afkEnabled;
+
+    private boolean advancementMessageEnabled;
+    private boolean deathMessageEnabled;
+    private boolean joinMessageEnabled;
+    private boolean kickMessageEnabled;
+    private boolean quitMessageEnabled;
 
     private int afkTimeout;
     private TextColor afkColor;
@@ -44,6 +51,26 @@ public class PluginConfig {
 
     public boolean isAfkEnabled() {
         return afkEnabled;
+    }
+
+    public boolean isAdvancementMessageEnabled() {
+        return advancementMessageEnabled;
+    }
+
+    public boolean isDeathMessageEnabled() {
+        return deathMessageEnabled;
+    }
+
+    public boolean isKickMessageEnabled() {
+        return kickMessageEnabled;
+    }
+
+    public boolean isJoinMessageEnabled() {
+        return joinMessageEnabled;
+    }
+
+    public boolean isQuitMessageEnabled() {
+        return quitMessageEnabled;
     }
 
     public int getAfkTimeout() {
@@ -80,7 +107,13 @@ public class PluginConfig {
 
         chatEnabled = config.getBoolean("chat.enabled", true);
         tabEnabled = config.getBoolean("tab.enabled", true);
+
         afkEnabled = config.getBoolean("afk.enabled", true);
+
+        joinMessageEnabled = config.getBoolean("messages.join", true);
+        quitMessageEnabled = config.getBoolean("messages.quit", true);
+        deathMessageEnabled = config.getBoolean("messages.death", true);
+        advancementMessageEnabled = config.getBoolean("messages.advancement", true);
 
         afkTimeout = config.getInt("afk.timeout", 300);
         if (afkTimeout <= 0) {

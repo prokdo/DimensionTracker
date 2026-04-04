@@ -8,6 +8,13 @@ afk:
   enabled:  true
   timeout:  300         # seconds, must be a positive number
 
+messages:
+  advancement:  true
+  death:        true
+  join:         true
+  kick:         true
+  quit:         true
+
 colors:
   overworld:  "#00FF00" # or GREEN / green
   nether:     "#FF0000" # or RED / red
