@@ -1,7 +1,6 @@
 # IDE (VS Code)
 .vscode/
 
-# Java + Maven
-target/
-*.class
-*.jar
+# Java + Gradle
+build/
+.gradle/

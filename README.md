@@ -30,9 +30,8 @@ Plugin for Minecraft Paper-based servers that colors player names in chat and TA
 
 ## Requirements
 
-- Minecraft version: 1.21+
 - Server core: Paper
-- Java version: 21+
+- Java version: 25+
 
 ## Installation
 
