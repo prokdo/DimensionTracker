@@ -22,35 +22,35 @@ public class AfkListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onMove(PlayerMoveEvent event) {
-        if (!hasActuallyMoved(event)) {
+        if (!this.hasActuallyMoved(event)) {
             return;
         }
-        afkManager.resetTimer(event.getPlayer());
+        this.afkManager.resetTimer(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChat(AsyncChatEvent event) {
-        afkManager.resetTimer(event.getPlayer());
+        this.afkManager.resetTimer(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInteract(PlayerInteractEvent event) {
-        afkManager.resetTimer(event.getPlayer());
+        this.afkManager.resetTimer(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent event) {
-        afkManager.resetTimer(event.getPlayer());
+        this.afkManager.resetTimer(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInteractEntity(PlayerInteractEntityEvent event) {
-        afkManager.resetTimer(event.getPlayer());
+        this.afkManager.resetTimer(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
-        afkManager.remove(event.getPlayer());
+        this.afkManager.remove(event.getPlayer());
     }
 
     private boolean hasActuallyMoved(PlayerMoveEvent event) {

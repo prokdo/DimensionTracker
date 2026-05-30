@@ -3,15 +3,17 @@ plugins {
 }
 
 group = "ru.prokdo"
-version = "1.3.0"
+version = "1.4.0"
 
 repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://repo.helpch.at/releases")
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:[26.1.2.build,)")
+    compileOnly("io.papermc.paper:paper-api:26.1.2.build.+")
+    compileOnly("me.clip:placeholderapi:2.12.2")
 }
 
 java {
@@ -26,5 +28,9 @@ tasks.jar {
 
 tasks.processResources {
     filteringCharset = "UTF-8"
-    expand(project.properties)
+    val props = mapOf("version" to project.version)
+    inputs.properties(props)
+    filesMatching("plugin.yml") {
+        expand(props)
+    }
 }

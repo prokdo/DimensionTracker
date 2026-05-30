@@ -37,103 +37,103 @@ public class PluginConfig {
 
     public PluginConfig(DimensionTracker plugin) {
         this.plugin = plugin;
-        plugin.saveDefaultConfig();
-        load();
+        this.plugin.saveDefaultConfig();
+        this.load();
     }
 
     public boolean isChatEnabled() {
-        return chatEnabled;
+        return this.chatEnabled;
     }
 
     public boolean isTabEnabled() {
-        return tabEnabled;
+        return this.tabEnabled;
     }
 
     public boolean isAfkEnabled() {
-        return afkEnabled;
+        return this.afkEnabled;
     }
 
     public boolean isAdvancementMessageEnabled() {
-        return advancementMessageEnabled;
+        return this.advancementMessageEnabled;
     }
 
     public boolean isDeathMessageEnabled() {
-        return deathMessageEnabled;
+        return this.deathMessageEnabled;
     }
 
     public boolean isKickMessageEnabled() {
-        return kickMessageEnabled;
+        return this.kickMessageEnabled;
     }
 
     public boolean isJoinMessageEnabled() {
-        return joinMessageEnabled;
+        return this.joinMessageEnabled;
     }
 
     public boolean isQuitMessageEnabled() {
-        return quitMessageEnabled;
+        return this.quitMessageEnabled;
     }
 
     public int getAfkTimeout() {
-        return afkTimeout;
+        return this.afkTimeout;
     }
 
     public TextColor getAfkColor() {
-        return afkColor;
+        return this.afkColor;
     }
 
     public TextColor getOverworldColor() {
-        return overworldColor;
+        return this.overworldColor;
     }
 
     public TextColor getNetherColor() {
-        return netherColor;
+        return this.netherColor;
     }
 
     public TextColor getEndColor() {
-        return endColor;
+        return this.endColor;
     }
 
     public TextColor getDefaultColor() {
-        return defaultColor;
+        return this.defaultColor;
     }
 
     public Map<String, TextColor> getWorldColors() {
-        return Collections.unmodifiableMap(worldColors);
+        return Collections.unmodifiableMap(this.worldColors);
     }
 
     public void load() {
-        plugin.reloadConfig();
-        final var config = plugin.getConfig();
+        this.plugin.reloadConfig();
+        final var config = this.plugin.getConfig();
 
-        chatEnabled = config.getBoolean("chat.enabled", true);
-        tabEnabled = config.getBoolean("tab.enabled", true);
+        this.chatEnabled = config.getBoolean("chat.enabled", true);
+        this.tabEnabled = config.getBoolean("tab.enabled", true);
 
-        afkEnabled = config.getBoolean("afk.enabled", true);
+        this.afkEnabled = config.getBoolean("afk.enabled", true);
 
-        joinMessageEnabled = config.getBoolean("messages.join", true);
-        quitMessageEnabled = config.getBoolean("messages.quit", true);
-        deathMessageEnabled = config.getBoolean("messages.death", true);
-        advancementMessageEnabled = config.getBoolean("messages.advancement", true);
+        this.joinMessageEnabled = config.getBoolean("messages.join", true);
+        this.quitMessageEnabled = config.getBoolean("messages.quit", true);
+        this.deathMessageEnabled = config.getBoolean("messages.death", true);
+        this.advancementMessageEnabled = config.getBoolean("messages.advancement", true);
 
-        afkTimeout = config.getInt("afk.timeout", 300);
-        if (afkTimeout <= 0) {
+        this.afkTimeout = config.getInt("afk.timeout", 300);
+        if (this.afkTimeout <= 0) {
             plugin.getLogger().warning("AFK timeout must be a positive number, using default (300)");
-            afkTimeout = 300;
+            this.afkTimeout = 300;
         }
 
         final var colors = config.getConfigurationSection("colors");
 
-        overworldColor = parseColor(colors, "overworld", NamedTextColor.GREEN);
-        netherColor = parseColor(colors, "nether", NamedTextColor.RED);
-        endColor = parseColor(colors, "end", NamedTextColor.LIGHT_PURPLE);
-        afkColor = parseColor(colors, "afk", NamedTextColor.GRAY);
-        defaultColor = parseColor(colors, "default", NamedTextColor.WHITE);
+        this.overworldColor = parseColor(colors, "overworld", NamedTextColor.GREEN);
+        this.netherColor = parseColor(colors, "nether", NamedTextColor.RED);
+        this.endColor = parseColor(colors, "end", NamedTextColor.LIGHT_PURPLE);
+        this.afkColor = parseColor(colors, "afk", NamedTextColor.GRAY);
+        this.defaultColor = parseColor(colors, "default", NamedTextColor.WHITE);
 
-        registerWorldColors(colors);
+        this.registerWorldColors(colors);
     }
 
     private void registerWorldColors(ConfigurationSection colors) {
-        worldColors.clear();
+        this.worldColors.clear();
         if (colors != null) {
             for (final var key : colors.getKeys(false)) {
                 if (key.equals("overworld") || key.equals("nether") ||
@@ -141,9 +141,9 @@ public class PluginConfig {
                         key.equals("default")) {
                     continue;
                 }
-                final var color = parseColor(colors, key, null);
+                final var color = this.parseColor(colors, key, null);
                 if (color != null) {
-                    worldColors.put(key, color);
+                    this.worldColors.put(key, color);
                 }
             }
         }
@@ -161,7 +161,8 @@ public class PluginConfig {
             if (color != null) {
                 return color;
             }
-            plugin.getLogger().warning(String.format("Invalid HEX color for key %s: %s, using fallback", key, value));
+            this.plugin.getLogger()
+                    .warning(String.format("Invalid HEX color for key %s: %s, using fallback", key, value));
             return fallback;
         }
 
@@ -170,7 +171,7 @@ public class PluginConfig {
             return named;
         }
 
-        plugin.getLogger().warning(String.format("Unknown color for key %s: %s, using fallback", key, value));
+        this.plugin.getLogger().warning(String.format("Unknown color for key %s: %s, using fallback", key, value));
         return fallback;
     }
 }

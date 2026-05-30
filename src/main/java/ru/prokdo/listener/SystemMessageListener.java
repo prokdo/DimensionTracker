@@ -25,7 +25,7 @@ public class SystemMessageListener implements Listener {
 
     @EventHandler
     public void onAdvancement(PlayerAdvancementDoneEvent event) {
-        if (!config.isAdvancementMessageEnabled()) {
+        if (!this.config.isAdvancementMessageEnabled()) {
             return;
         }
 
@@ -35,15 +35,15 @@ public class SystemMessageListener implements Listener {
         }
 
         final var player = event.getPlayer();
-        final var color = colorManager.getColorForPlayer(player);
+        final var color = this.colorManager.getColorForPlayer(player);
 
-        message = colorPlayerName(message, player.getName(), color);
+        message = this.colorPlayerName(message, player.getName(), color);
         event.message(message);
     }
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        if (!config.isDeathMessageEnabled()) {
+        if (!this.config.isDeathMessageEnabled()) {
             return;
         }
 
@@ -53,15 +53,15 @@ public class SystemMessageListener implements Listener {
         }
 
         final var player = event.getPlayer();
-        final var color = colorManager.getColorForPlayer(player);
+        final var color = this.colorManager.getColorForPlayer(player);
 
-        message = colorPlayerName(message, player.getName(), color);
+        message = this.colorPlayerName(message, player.getName(), color);
         event.deathMessage(message);
     }
 
     @EventHandler
     public void onKick(PlayerKickEvent event) {
-        if (!config.isKickMessageEnabled()) {
+        if (!this.config.isKickMessageEnabled()) {
             return;
         }
 
@@ -71,15 +71,15 @@ public class SystemMessageListener implements Listener {
         }
 
         final var player = event.getPlayer();
-        final var color = colorManager.getColorForPlayer(player);
+        final var color = this.colorManager.getColorForPlayer(player);
 
-        message = colorPlayerName(message, player.getName(), color);
+        message = this.colorPlayerName(message, player.getName(), color);
         event.leaveMessage(message);
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        if (!config.isJoinMessageEnabled()) {
+        if (!this.config.isJoinMessageEnabled()) {
             return;
         }
 
@@ -89,15 +89,15 @@ public class SystemMessageListener implements Listener {
         }
 
         final var player = event.getPlayer();
-        final var color = colorManager.getColorForPlayer(player);
+        final var color = this.colorManager.getColorForPlayer(player);
 
-        message = colorPlayerName(message, player.getName(), color);
+        message = this.colorPlayerName(message, player.getName(), color);
         event.joinMessage(message);
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        if (!config.isQuitMessageEnabled()) {
+        if (!this.config.isQuitMessageEnabled()) {
             return;
         }
 
@@ -107,9 +107,9 @@ public class SystemMessageListener implements Listener {
         }
 
         final var player = event.getPlayer();
-        final var color = colorManager.getColorForPlayer(player);
+        final var color = this.colorManager.getColorForPlayer(player);
 
-        message = colorPlayerName(message, player.getName(), color);
+        message = this.colorPlayerName(message, player.getName(), color);
         event.quitMessage(message);
     }
 

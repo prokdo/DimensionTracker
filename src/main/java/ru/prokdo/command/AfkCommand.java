@@ -23,7 +23,7 @@ public class AfkCommand {
                         player.hasPermission("dimensiontracker.afk"))
                 .executes(ctx -> {
                     final var player = (Player) ctx.getSource().getSender();
-                    afkManager.toggle(player);
+                    this.afkManager.toggle(player);
                     return Command.SINGLE_SUCCESS;
                 })
                 .build();

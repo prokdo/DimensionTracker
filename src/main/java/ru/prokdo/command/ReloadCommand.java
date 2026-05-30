@@ -27,10 +27,10 @@ public class ReloadCommand {
         return Commands.literal("reload")
                 .requires(source -> source.getSender().hasPermission("dimensiontracker.reload"))
                 .executes(ctx -> {
-                    config.load();
+                    this.config.load();
                     final var onlinePlayers = Bukkit.getOnlinePlayers();
-                    colorManager.update(onlinePlayers);
-                    afkManager.resetTimer(onlinePlayers);
+                    this.colorManager.update(onlinePlayers);
+                    this.afkManager.resetTimer(onlinePlayers);
                     return Command.SINGLE_SUCCESS;
                 })
                 .build();

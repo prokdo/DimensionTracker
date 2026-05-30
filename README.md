@@ -18,6 +18,7 @@ Plugin for Minecraft Paper-based servers that colors player names in chat and TA
 - Built-in AFK detection with configurable timeout and color
 - Manual AFK toggle
 - No initial configuration required, works out of the box
+- Optional [PlaceholderAPI](https://github.com/PlaceholderAPI/PlaceholderAPI) integration
 
 ## Colors
 

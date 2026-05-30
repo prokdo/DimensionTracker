@@ -4,3 +4,4 @@
 # Java + Gradle
 build/
 .gradle/
+bin/
