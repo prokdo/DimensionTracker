@@ -25,46 +25,46 @@ public class AfkManager {
     }
 
     public boolean isAfk(Player player) {
-        return afkStatuses.getOrDefault(player.getUniqueId(), false);
+        return this.afkStatuses.getOrDefault(player.getUniqueId(), false);
     }
 
     public void setAfk(Player player, boolean afk) {
-        if (!config.isAfkEnabled()) {
+        if (!this.config.isAfkEnabled()) {
             return;
         }
-        afkStatuses.put(player.getUniqueId(), afk);
-        colorManager.update(player);
+        this.afkStatuses.put(player.getUniqueId(), afk);
+        this.colorManager.update(player);
     }
 
     public void toggle(Player player) {
-        if (!config.isAfkEnabled()) {
+        if (!this.config.isAfkEnabled()) {
             return;
         }
-        setAfk(player, !isAfk(player));
+        this.setAfk(player, !isAfk(player));
     }
 
     public void resetTimer(Player player) {
-        if (!config.isAfkEnabled()) {
+        if (!this.config.isAfkEnabled()) {
             return;
         }
 
-        if (isAfk(player)) {
-            setAfk(player, false);
+        if (this.isAfk(player)) {
+            this.setAfk(player, false);
         }
 
-        final var existing = afkTimers.remove(player.getUniqueId());
+        final var existing = this.afkTimers.remove(player.getUniqueId());
         if (existing != null) {
             existing.cancel();
         }
 
-        final var ticks = config.getAfkTimeout() * 20L;
-        final var task = plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+        final var ticks = this.config.getAfkTimeout() * 20L;
+        final var task = this.plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
             if (player.isOnline()) {
-                setAfk(player, true);
+                this.setAfk(player, true);
             }
         }, ticks);
 
-        afkTimers.put(player.getUniqueId(), task);
+        this.afkTimers.put(player.getUniqueId(), task);
     }
 
     public void resetTimer(Iterable<? extends Player> players) {
@@ -72,8 +72,8 @@ public class AfkManager {
     }
 
     public void remove(Player player) {
-        afkStatuses.remove(player.getUniqueId());
-        final var task = afkTimers.remove(player.getUniqueId());
+        this.afkStatuses.remove(player.getUniqueId());
+        final var task = this.afkTimers.remove(player.getUniqueId());
         if (task != null) {
             task.cancel();
         }

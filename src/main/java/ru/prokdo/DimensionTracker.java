@@ -9,6 +9,7 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 
 import ru.prokdo.command.DimensionTrackerCommand;
 import ru.prokdo.config.PluginConfig;
+import ru.prokdo.integration.papi.DimensionTrackerPlaceholderAPIExpansion;
 import ru.prokdo.manager.AfkManager;
 import ru.prokdo.manager.PlayerColorManager;
 import ru.prokdo.listener.AfkListener;
@@ -23,33 +24,40 @@ public class DimensionTracker extends JavaPlugin {
     private AfkListener afkListener;
     private SystemMessageListener systemMessageListener;
 
+    private DimensionTrackerPlaceholderAPIExpansion pApiExpansion;
+
     @Override
     public void onEnable() {
-        pluginConfig = new PluginConfig(this);
+        this.pluginConfig = new PluginConfig(this);
 
-        colorManager = new PlayerColorManager(pluginConfig);
-        afkManager = new AfkManager(this, pluginConfig, colorManager);
+        this.colorManager = new PlayerColorManager(this.pluginConfig);
+        this.afkManager = new AfkManager(this, this.pluginConfig, this.colorManager);
 
-        colorManager.setAfkManager(afkManager);
+        this.colorManager.setAfkManager(this.afkManager);
 
-        displayListener = new PlayerDisplayListener(pluginConfig, colorManager);
-        afkListener = new AfkListener(afkManager);
-        systemMessageListener = new SystemMessageListener(pluginConfig, colorManager);
+        this.displayListener = new PlayerDisplayListener(this.pluginConfig, this.colorManager);
+        this.afkListener = new AfkListener(this.afkManager);
+        this.systemMessageListener = new SystemMessageListener(this.pluginConfig, this.colorManager);
 
-        Bukkit.getPluginManager().registerEvents(displayListener, this);
-        Bukkit.getPluginManager().registerEvents(afkListener, this);
-        Bukkit.getPluginManager().registerEvents(systemMessageListener, this);
+        Bukkit.getPluginManager().registerEvents(this.displayListener, this);
+        Bukkit.getPluginManager().registerEvents(this.afkListener, this);
+        Bukkit.getPluginManager().registerEvents(this.systemMessageListener, this);
 
-        registerCommands();
+        this.registerCommands();
+
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            this.pApiExpansion = new DimensionTrackerPlaceholderAPIExpansion(this, this.afkManager, this.colorManager);
+            this.pApiExpansion.register();
+        }
 
         final var onlinePlayers = Bukkit.getOnlinePlayers();
-        colorManager.update(onlinePlayers);
-        afkManager.resetTimer(onlinePlayers);
+        this.colorManager.update(onlinePlayers);
+        this.afkManager.resetTimer(onlinePlayers);
     }
 
     private void registerCommands() {
-        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
-            final var command = new DimensionTrackerCommand(pluginConfig, colorManager, afkManager);
+        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+            final var command = new DimensionTrackerCommand(this.pluginConfig, this.colorManager, this.afkManager);
             event.registrar().register(command.build(), "DimensionTracker plugin command", List.of("dt"));
         });
     }

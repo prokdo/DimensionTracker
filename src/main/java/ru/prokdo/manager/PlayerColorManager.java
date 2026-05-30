@@ -20,10 +20,10 @@ public class PlayerColorManager {
     }
 
     public void update(Player player) {
-        if (!config.isTabEnabled()) {
+        if (!this.config.isTabEnabled()) {
             return;
         }
-        final var color = getColorForPlayer(player);
+        final var color = this.getColorForPlayer(player);
         player.playerListName(Component.text(player.getName(), color));
     }
 
@@ -32,12 +32,12 @@ public class PlayerColorManager {
     }
 
     public TextColor getColorForPlayer(Player player) {
-        if (afkManager != null && afkManager.isAfk(player)) {
-            return config.getAfkColor();
+        if (this.afkManager != null && this.afkManager.isAfk(player)) {
+            return this.config.getAfkColor();
         }
 
         final var worldName = player.getWorld().getName();
-        final var worldColors = config.getWorldColors();
+        final var worldColors = this.config.getWorldColors();
 
         if (worldColors.containsKey(worldName)) {
             return worldColors.get(worldName);
@@ -45,10 +45,10 @@ public class PlayerColorManager {
 
         final var env = player.getWorld().getEnvironment();
         return switch (env) {
-            case NORMAL -> config.getOverworldColor();
-            case NETHER -> config.getNetherColor();
-            case THE_END -> config.getEndColor();
-            default -> config.getDefaultColor();
+            case NORMAL -> this.config.getOverworldColor();
+            case NETHER -> this.config.getNetherColor();
+            case THE_END -> this.config.getEndColor();
+            default -> this.config.getDefaultColor();
         };
     }
 }

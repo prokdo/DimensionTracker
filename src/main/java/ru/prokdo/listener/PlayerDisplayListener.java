@@ -26,23 +26,23 @@ public class PlayerDisplayListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         final var player = event.getPlayer();
-        colorManager.update(player);
+        this.colorManager.update(player);
     }
 
     @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent event) {
         final var player = event.getPlayer();
-        colorManager.update(player);
+        this.colorManager.update(player);
     }
 
     @EventHandler
     public void onChat(AsyncChatEvent event) {
-        if (!config.isChatEnabled()) {
+        if (!this.config.isChatEnabled()) {
             return;
         }
 
         final var player = event.getPlayer();
-        final var color = colorManager.getColorForPlayer(player);
+        final var color = this.colorManager.getColorForPlayer(player);
 
         final var playerName = player.getName();
         final var coloredName = Component.text(playerName, color);

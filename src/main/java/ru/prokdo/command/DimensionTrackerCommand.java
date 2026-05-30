@@ -22,8 +22,8 @@ public class DimensionTrackerCommand {
 
     public LiteralCommandNode<CommandSourceStack> build() {
         return Commands.literal("dimensiontracker")
-                .then(new ReloadCommand(config, colorManager, afkManager).build())
-                .then(new AfkCommand(afkManager).build())
+                .then(new ReloadCommand(this.config, this.colorManager, this.afkManager).build())
+                .then(new AfkCommand(this.afkManager).build())
                 .build();
     }
 }

@@ -1,7 +1,9 @@
 name: DimensionTracker
-version: '${project.version}'
+version: '${version}'
 main: ru.prokdo.DimensionTracker
 api-version: '26.1'
+
+softdepend: [PlaceholderAPI]
 
 permissions:
   dimensiontracker.reload:
