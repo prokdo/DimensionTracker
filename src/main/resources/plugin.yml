@@ -1,7 +1,7 @@
 name: DimensionTracker
 version: '${version}'
 main: ru.prokdo.DimensionTracker
-api-version: '26.1'
+api-version: '26.2'
 
 softdepend: [PlaceholderAPI]
 
