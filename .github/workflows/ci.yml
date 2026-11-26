@@ -1,0 +1,38 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v6
+      - name: Build plugin
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
+            version_arg="-PreleaseTag=$GITHUB_REF_NAME"
+          else
+            version_arg="-PdevCommit=${GITHUB_SHA:0:12}"
+          fi
+          ./gradlew --no-daemon clean build "$version_arg"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: DimensionTracker
+          path: build/libs/DimensionTracker-*.jar
+          if-no-files-found: error

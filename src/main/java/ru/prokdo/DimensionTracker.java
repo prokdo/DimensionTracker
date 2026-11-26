@@ -1,6 +1,8 @@
 package ru.prokdo;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,10 +32,9 @@ public class DimensionTracker extends JavaPlugin {
     public void onEnable() {
         this.pluginConfig = new PluginConfig(this);
 
-        this.colorManager = new PlayerColorManager(this.pluginConfig);
-        this.afkManager = new AfkManager(this, this.pluginConfig, this.colorManager);
-
-        this.colorManager.setAfkManager(this.afkManager);
+        final var afkPlayers = ConcurrentHashMap.<UUID>newKeySet();
+        this.colorManager = new PlayerColorManager(this.pluginConfig, afkPlayers::contains);
+        this.afkManager = new AfkManager(this, this.pluginConfig, afkPlayers, this.colorManager::update);
 
         this.displayListener = new PlayerDisplayListener(this.pluginConfig, this.colorManager);
         this.afkListener = new AfkListener(this.afkManager);
@@ -52,7 +53,21 @@ public class DimensionTracker extends JavaPlugin {
 
         final var onlinePlayers = Bukkit.getOnlinePlayers();
         this.colorManager.update(onlinePlayers);
-        this.afkManager.resetTimer(onlinePlayers);
+        this.afkManager.recordActivity(onlinePlayers);
+        this.getServer().getScheduler().runTaskTimer(this, this.afkManager::checkInactivity, 20L, 20L);
+    }
+
+    @Override
+    public void onDisable() {
+        if (this.pApiExpansion != null) {
+            this.pApiExpansion.unregister();
+        }
+        if (this.afkManager != null) {
+            this.afkManager.clear();
+        }
+        if (this.colorManager != null) {
+            Bukkit.getOnlinePlayers().forEach(this.colorManager::remove);
+        }
     }
 
     private void registerCommands() {

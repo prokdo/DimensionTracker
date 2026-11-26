@@ -23,4 +23,4 @@ colors:
   default:    "#FFFFFF" # or WHITE / white
 
   # Custom world example:
-  # custom_world_name: "#RRGGBB" or standard color name
+  # custom_world_name: "#FFFF00"
