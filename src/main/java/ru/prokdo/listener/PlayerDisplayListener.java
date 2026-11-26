@@ -1,15 +1,13 @@
 package ru.prokdo.listener;
 
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
-import io.papermc.paper.chat.ChatRenderer;
 import io.papermc.paper.event.player.AsyncChatEvent;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 import ru.prokdo.manager.PlayerColorManager;
 import ru.prokdo.config.PluginConfig;
@@ -35,28 +33,21 @@ public class PlayerDisplayListener implements Listener {
         this.colorManager.update(player);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onQuit(PlayerQuitEvent event) {
+        this.colorManager.remove(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onChat(AsyncChatEvent event) {
-        if (!this.config.isChatEnabled()) {
+        final var settings = this.config.settings();
+        if (!settings.chatEnabled()) {
             return;
         }
 
-        final var player = event.getPlayer();
-        final var color = this.colorManager.getColorForPlayer(player);
-
-        final var playerName = player.getName();
-        final var coloredName = Component.text(playerName, color);
-        final var openBracket = Component.text("<", NamedTextColor.WHITE);
-        final var closeBracket = Component.text(">", NamedTextColor.WHITE);
-        final var space = Component.text(" ");
-
-        event.renderer(ChatRenderer.viewerUnaware((source, sourceDisplayName, message) -> Component.text()
-                .append(openBracket)
-                .append(coloredName)
-                .append(closeBracket)
-                .append(space)
-                .append(message)
-                .build()));
-
+        final var color = this.colorManager.getColorForPlayer(event.getPlayer(), settings);
+        final var renderer = event.renderer();
+        event.renderer((source, sourceDisplayName, message, viewer) ->
+                renderer.render(source, sourceDisplayName.color(color), message, viewer));
     }
 }

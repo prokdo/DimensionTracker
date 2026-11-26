@@ -1,5 +1,7 @@
 package ru.prokdo.integration.papi;
 
+import java.util.Locale;
+
 import org.bukkit.entity.Player;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
@@ -47,9 +49,18 @@ public class DimensionTrackerPlaceholderAPIExpansion extends PlaceholderExpansio
         }
 
         return switch (params) {
-            case "afk" -> this.afkManager.isAfk(player) ? "afk" : "active";
-            case "dimension" -> player.getWorld().getEnvironment().name().toLowerCase();
-            case "world" -> player.getWorld().getName();
+            case "afk" -> this.afkManager.isAfk(player.getUniqueId()) ? "afk" : "active";
+            case "dimension" -> {
+                final var world = this.colorManager.getPlayerWorld(player);
+                yield world == null ? "" : switch (world.environment()) {
+                    case NORMAL -> "overworld";
+                    default -> world.environment().name().toLowerCase(Locale.ROOT);
+                };
+            }
+            case "world" -> {
+                final var world = this.colorManager.getPlayerWorld(player);
+                yield world != null ? world.name() : "";
+            }
             case "color" -> this.colorManager.getColorForPlayer(player).asHexString();
             default -> null;
         };

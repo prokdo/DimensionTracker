@@ -1,10 +1,18 @@
 package ru.prokdo.config;
 
-import java.util.Collections;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
+import org.bukkit.World.Environment;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -13,140 +21,108 @@ import ru.prokdo.DimensionTracker;
 
 public class PluginConfig {
     private final DimensionTracker plugin;
+    private final ConfigurationSection defaultColors;
+    private volatile Settings settings;
 
-    private boolean chatEnabled;
-    private boolean tabEnabled;
+    public record Settings(boolean chatEnabled, boolean tabEnabled, boolean afkEnabled, int afkTimeout,
+            boolean advancementMessageEnabled, boolean deathMessageEnabled, boolean joinMessageEnabled,
+            boolean kickMessageEnabled, boolean quitMessageEnabled, TextColor overworldColor, TextColor netherColor,
+            TextColor endColor, TextColor afkColor, TextColor defaultColor, Map<String, TextColor> worldColors) {
+        public Settings {
+            worldColors = Map.copyOf(worldColors);
+        }
 
-    private boolean afkEnabled;
+        public TextColor colorForWorld(String name, Environment environment) {
+            final var worldColor = this.worldColors.get(name);
+            if (worldColor != null) {
+                return worldColor;
+            }
 
-    private boolean advancementMessageEnabled;
-    private boolean deathMessageEnabled;
-    private boolean joinMessageEnabled;
-    private boolean kickMessageEnabled;
-    private boolean quitMessageEnabled;
-
-    private int afkTimeout;
-    private TextColor afkColor;
-
-    private TextColor overworldColor;
-    private TextColor netherColor;
-    private TextColor endColor;
-    private TextColor defaultColor;
-
-    private final Map<String, TextColor> worldColors = new HashMap<>();
+            return switch (environment) {
+                case NORMAL -> this.overworldColor;
+                case NETHER -> this.netherColor;
+                case THE_END -> this.endColor;
+                default -> this.defaultColor;
+            };
+        }
+    }
 
     public PluginConfig(DimensionTracker plugin) {
         this.plugin = plugin;
         this.plugin.saveDefaultConfig();
-        this.load();
+        try {
+            final var defaults = new YamlConfiguration();
+            final var resource = Objects.requireNonNull(this.plugin.getResource("config.yml"), "Missing bundled config.yml");
+            try (final var reader = new InputStreamReader(resource, StandardCharsets.UTF_8)) {
+                defaults.load(reader);
+            }
+            this.defaultColors = Objects.requireNonNull(defaults.getConfigurationSection("colors"),
+                    "Missing colors section in bundled config.yml");
+            this.load();
+        } catch (IOException | InvalidConfigurationException exception) {
+            throw new IllegalStateException("Could not load DimensionTracker config.yml", exception);
+        }
     }
 
-    public boolean isChatEnabled() {
-        return this.chatEnabled;
+    public Settings settings() {
+        return this.settings;
     }
 
-    public boolean isTabEnabled() {
-        return this.tabEnabled;
-    }
+    public void load() throws IOException, InvalidConfigurationException {
+        final var config = new YamlConfiguration();
+        config.load(new File(this.plugin.getDataFolder(), "config.yml"));
 
-    public boolean isAfkEnabled() {
-        return this.afkEnabled;
-    }
-
-    public boolean isAdvancementMessageEnabled() {
-        return this.advancementMessageEnabled;
-    }
-
-    public boolean isDeathMessageEnabled() {
-        return this.deathMessageEnabled;
-    }
-
-    public boolean isKickMessageEnabled() {
-        return this.kickMessageEnabled;
-    }
-
-    public boolean isJoinMessageEnabled() {
-        return this.joinMessageEnabled;
-    }
-
-    public boolean isQuitMessageEnabled() {
-        return this.quitMessageEnabled;
-    }
-
-    public int getAfkTimeout() {
-        return this.afkTimeout;
-    }
-
-    public TextColor getAfkColor() {
-        return this.afkColor;
-    }
-
-    public TextColor getOverworldColor() {
-        return this.overworldColor;
-    }
-
-    public TextColor getNetherColor() {
-        return this.netherColor;
-    }
-
-    public TextColor getEndColor() {
-        return this.endColor;
-    }
-
-    public TextColor getDefaultColor() {
-        return this.defaultColor;
-    }
-
-    public Map<String, TextColor> getWorldColors() {
-        return Collections.unmodifiableMap(this.worldColors);
-    }
-
-    public void load() {
-        this.plugin.reloadConfig();
-        final var config = this.plugin.getConfig();
-
-        this.chatEnabled = config.getBoolean("chat.enabled", true);
-        this.tabEnabled = config.getBoolean("tab.enabled", true);
-
-        this.afkEnabled = config.getBoolean("afk.enabled", true);
-
-        this.joinMessageEnabled = config.getBoolean("messages.join", true);
-        this.quitMessageEnabled = config.getBoolean("messages.quit", true);
-        this.deathMessageEnabled = config.getBoolean("messages.death", true);
-        this.advancementMessageEnabled = config.getBoolean("messages.advancement", true);
-
-        this.afkTimeout = config.getInt("afk.timeout", 300);
-        if (this.afkTimeout <= 0) {
-            plugin.getLogger().warning("AFK timeout must be a positive number, using default (300)");
-            this.afkTimeout = 300;
+        var afkTimeout = config.getInt("afk.timeout", 300);
+        if (afkTimeout <= 0) {
+            this.plugin.getLogger().warning("AFK timeout must be a positive number, using default (300)");
+            afkTimeout = 300;
         }
 
         final var colors = config.getConfigurationSection("colors");
-
-        this.overworldColor = parseColor(colors, "overworld", NamedTextColor.GREEN);
-        this.netherColor = parseColor(colors, "nether", NamedTextColor.RED);
-        this.endColor = parseColor(colors, "end", NamedTextColor.LIGHT_PURPLE);
-        this.afkColor = parseColor(colors, "afk", NamedTextColor.GRAY);
-        this.defaultColor = parseColor(colors, "default", NamedTextColor.WHITE);
-
-        this.registerWorldColors(colors);
+        this.settings = new Settings(
+                config.getBoolean("chat.enabled", true),
+                config.getBoolean("tab.enabled", true),
+                config.getBoolean("afk.enabled", true),
+                afkTimeout,
+                config.getBoolean("messages.advancement", true),
+                config.getBoolean("messages.death", true),
+                config.getBoolean("messages.join", true),
+                config.getBoolean("messages.kick", true),
+                config.getBoolean("messages.quit", true),
+                this.colorWithDefault(colors, "overworld"),
+                this.colorWithDefault(colors, "nether"),
+                this.colorWithDefault(colors, "end"),
+                this.colorWithDefault(colors, "afk"),
+                this.colorWithDefault(colors, "default"),
+                this.readWorldColors(colors));
     }
 
-    private void registerWorldColors(ConfigurationSection colors) {
-        this.worldColors.clear();
-        if (colors != null) {
-            for (final var key : colors.getKeys(false)) {
-                if (key.equals("overworld") || key.equals("nether") ||
-                        key.equals("end") || key.equals("afk") ||
-                        key.equals("default")) {
+    private TextColor colorWithDefault(ConfigurationSection section, String key) {
+        final var fallback = Objects.requireNonNull(this.parseColor(this.defaultColors, key, null),
+                "Missing or invalid colors." + key + " in bundled config.yml");
+        return this.parseColor(section, key, fallback);
+    }
+
+    private Map<String, TextColor> readWorldColors(ConfigurationSection colors) {
+        final var worldColors = new HashMap<String, TextColor>();
+        if (colors == null) {
+            return worldColors;
+        }
+
+        for (final var key : colors.getKeys(false)) {
+            switch (key) {
+                case "overworld", "nether", "end", "afk", "default" -> {
                     continue;
                 }
-                final var color = this.parseColor(colors, key, null);
-                if (color != null) {
-                    this.worldColors.put(key, color);
+                default -> {
+                    final var color = this.parseColor(colors, key, null);
+                    if (color != null) {
+                        worldColors.put(key, color);
+                    }
                 }
             }
         }
+        return worldColors;
     }
 
     private TextColor parseColor(ConfigurationSection section, String key, TextColor fallback) {
@@ -155,23 +131,13 @@ public class PluginConfig {
         }
 
         final var value = section.getString(key, "").trim();
-
-        if (value.startsWith("#")) {
-            final var color = TextColor.fromHexString(value);
-            if (color != null) {
-                return color;
-            }
-            this.plugin.getLogger()
-                    .warning(String.format("Invalid HEX color for key %s: %s, using fallback", key, value));
+        final var color = value.startsWith("#")
+                ? TextColor.fromHexString(value)
+                : NamedTextColor.NAMES.value(value.toLowerCase(Locale.ROOT));
+        if (color == null) {
+            this.plugin.getLogger().warning(String.format("Invalid color for key %s: %s, using fallback", key, value));
             return fallback;
         }
-
-        final var named = NamedTextColor.NAMES.value(value.toLowerCase());
-        if (named != null) {
-            return named;
-        }
-
-        this.plugin.getLogger().warning(String.format("Unknown color for key %s: %s, using fallback", key, value));
-        return fallback;
+        return color;
     }
 }
